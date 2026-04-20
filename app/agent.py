@@ -47,7 +47,7 @@ class LabAgent:
         # ===== LLM =====
         response = self.llm.generate(prompt)
 
-        # ===== Metrics =====
+        # Metrics 
         latency_ms = int((time.perf_counter() - started) * 1000)
         tokens_in = response.usage.input_tokens
         tokens_out = response.usage.output_tokens
