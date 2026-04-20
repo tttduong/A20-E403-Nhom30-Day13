@@ -3,21 +3,21 @@
 > **Instruction**: Fill in all sections below. This report is designed to be parsed by an automated grading assistant. Ensure all tags (e.g., `[GROUP_NAME]`) are preserved.
 
 ## 1. Team Metadata
-- [GROUP_NAME]: 
-- [REPO_URL]: 
+- [GROUP_NAME]: Nhóm 30 — A20-E403
+- [REPO_URL]: https://github.com/tttduong/A20-E403-Nhom30-Day13
 - [MEMBERS]:
   - Member A: [Name] | Role: Logging & PII
   - Member B: [Name] | Role: Tracing & Enrichment
-  - Member C: [Name] | Role: SLO & Alerts
+  - Member C: Hồ Quang Hiển | Role: SLO & Alerts
   - Member D: [Name] | Role: Load Test & Dashboard
   - Member E: [Name] | Role: Demo & Report
 
 ---
 
 ## 2. Group Performance (Auto-Verified)
-- [VALIDATE_LOGS_FINAL_SCORE]: /100
-- [TOTAL_TRACES_COUNT]: 
-- [PII_LEAKS_FOUND]: 
+- [VALIDATE_LOGS_FINAL_SCORE]: 100/100
+- [TOTAL_TRACES_COUNT]: (đếm trên Langfuse sau load test; mục tiêu ≥ 10)
+- [PII_LEAKS_FOUND]: 0
 
 ---
 
@@ -31,25 +31,26 @@
 
 ### 3.2 Dashboard & SLOs
 - [DASHBOARD_6_PANELS_SCREENSHOT]: [Path to image]
-- [SLO_TABLE]:
+- [SLO_TABLE]: (Snapshot `GET /metrics`: `traffic`=110, `tokens_in_total`=3740, `tokens_out_total`=14809; trước nộp nên chạy lại `curl` để đồng bộ)
 | SLI | Target | Window | Current Value |
 |---|---:|---|---:|
-| Latency P95 | < 3000ms | 28d | |
-| Error Rate | < 2% | 28d | |
-| Cost Budget | < $2.5/day | 1d | |
+| Latency P95 | < 3000ms | 28d | 150 ms (`latency_p95`; nội bộ agent, khác RTT client) |
+| Error Rate | < 2% | 28d | 0% (110 request, `error_breakdown` rỗng) |
+| Cost Budget | < $2.5/day | 1d | $0.2334 (`total_cost_usd`; `avg_cost_usd` ≈ 0.0021/request) |
+| Quality (avg heuristic) | ≥ 0.75 | 28d | 0.88 (`quality_avg`) |
 
 ### 3.3 Alerts & Runbook
-- [ALERT_RULES_SCREENSHOT]: [Path to image]
-- [SAMPLE_RUNBOOK_LINK]: [docs/alerts.md#L...]
+- [ALERT_RULES_SCREENSHOT]: `docs/evidence/alert-rules-screenshot.png`
+- [SAMPLE_RUNBOOK_LINK]: docs/alerts.md#1-high-latency-p95
 
 ---
 
 ## 4. Incident Response (Group)
-- [SCENARIO_NAME]: (e.g., rag_slow)
-- [SYMPTOMS_OBSERVED]: 
-- [ROOT_CAUSE_PROVED_BY]: (List specific Trace ID or Log Line)
-- [FIX_ACTION]: 
-- [PREVENTIVE_MEASURE]: 
+- [SCENARIO_NAME]: rag_slow (draft — D chạy inject rồi cập nhật số liệu thật)
+- [SYMPTOMS_OBSERVED]: P95 HTTP/client tăng; span RAG chiếm phần lớn thời gian trace (điền số sau khi bật incident)
+- [ROOT_CAUSE_PROVED_BY]: Toggle `rag_slow` trong `app/incidents.py` / API `POST /incidents/rag_slow/enable` — kèm Trace ID hoặc dòng log sau khi đo
+- [FIX_ACTION]: `POST /incidents/rag_slow/disable` hoặc tắt toggle tương đương
+- [PREVENTIVE_MEASURE]: Alert `high_latency_p95` + runbook mục 1 trong `docs/alerts.md`
 
 ---
 
@@ -64,8 +65,9 @@
 - [EVIDENCE_LINK]: 
 
 ### [MEMBER_C_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
+- **Đã điền — Thành viên C:** Hồ Quang Hiển
+- [TASKS_COMPLETED]: Hoàn thiện `config/slo.yaml` (SLI + map `/metrics`); 4 rule `config/alert_rules.yaml` + runbook `docs/alerts.md` (thêm mục quality); điền blueprint mục 3.2–3.3 + draft mục 4; thêm `docs/huong-dan-bao-cao-va-chung-minh.md`; cập nhật `docs/grading-evidence.md`.
+- [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/blob/main/config/alert_rules.yaml — **sau khi push đủ thay đổi**, nên thay bằng URL commit cụ thể trên repo này (Git Evidence)
 
 ### [MEMBER_D_NAME]
 - [TASKS_COMPLETED]: 

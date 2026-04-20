@@ -19,7 +19,8 @@ configure_logging()
 log = get_logger()
 app = FastAPI(title="Day 13 Observability Lab")
 app.add_middleware(CorrelationIdMiddleware)
-agent = LabAgent()
+# Cùng một biến MODEL_NAME cho FakeLLM và field model trong log / trace tags
+agent = LabAgent(model=os.getenv("MODEL_NAME", "claude-sonnet-4-5"))
 
 
 @app.on_event("startup")
@@ -44,15 +45,11 @@ async def metrics() -> dict:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
-    # TODO: Enrich logs with request context (user_id_hash, session_id, feature, model, env)
-    # bind_contextvars(...)
-    
-    # Enrich logs with request context
     bind_contextvars(
         user_id_hash=hash_user_id(body.user_id),
         session_id=body.session_id,
         feature=body.feature,
-        model=os.getenv("MODEL_NAME", "gpt-4"),
+        model=agent.model,
         env=os.getenv("APP_ENV", "dev"),
     )
     

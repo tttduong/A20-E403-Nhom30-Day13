@@ -1,3 +1,5 @@
+# Ba rule bắt buộc + một rule bonus (chất lượng).
+# runbook: anchor tương ứng mục trong docs/alerts.md
 alerts:
   - name: high_latency_p95
     severity: P2
@@ -17,3 +19,9 @@ alerts:
     type: symptom-based
     owner: finops-owner
     runbook: docs/alerts.md#3-cost-budget-spike
+  - name: quality_score_below_slo
+    severity: P3
+    condition: quality_score_avg < 0.75 for 1h
+    type: slo-based
+    owner: team-oncall
+    runbook: docs/alerts.md#4-low-average-quality-score
