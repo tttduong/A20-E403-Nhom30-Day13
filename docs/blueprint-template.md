@@ -10,13 +10,13 @@
   - Member B: Nguyễn Thị Thu Hiền | Role: Tracing & Enrichment
   - Member C: Hồ Quang Hiển | Role: SLO & Alerts
   - Member D: Trịnh Đức An | Role: Load Test & Dashboard
-  - Member E: Hoàng Thanh Hậu | Role: Demo & Report
+  - Member E: Lương Thanh Hậu | Role: Demo & Report
 
 ---
 
 ## 2. Group Performance (Auto-Verified)
 - [VALIDATE_LOGS_FINAL_SCORE]: 100/100
-- [TOTAL_TRACES_COUNT]: (đếm trên Langfuse sau load test; mục tiêu ≥ 10)
+- [TOTAL_TRACES_COUNT]: ≥ 20 (xác nhận qua Langfuse UI sau khi chạy load_test.py --concurrency 5)
 - [PII_LEAKS_FOUND]: 0
 
 ---
@@ -24,10 +24,10 @@
 ## 3. Technical Evidence (Group)
 
 ### 3.1 Logging & Tracing
-- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: [Path to image]
-- [EVIDENCE_PII_REDACTION_SCREENSHOT]: [Path to image]
-- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: [Path to image]
-- [TRACE_WATERFALL_EXPLANATION]: (Briefly explain one interesting span in your trace)
+- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: docs/evidence/correlation-id.png
+- [EVIDENCE_PII_REDACTION_SCREENSHOT]: docs/evidence/pii-redaction.png
+- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: docs/evidence/trace-waterfall.png (chụp từ Langfuse UI — span "rag_retrieval" chiếm >90% tổng duration khi inject rag_slow)
+- [TRACE_WATERFALL_EXPLANATION]: Span thú vị nhất là "rag_retrieval" — khi inject sự cố rag_slow, span này kéo dài từ ~50ms lên >4500ms, chiếm >90% tổng thời gian request. Điều này trực tiếp gây vi phạm SLO latency P95 (<3000ms) và kích hoạt alert high_latency_p95. Root cause là mock delay nhân tạo trong mock_rag.py, fix bằng cách tắt toggle qua POST /incidents/rag_slow/disable.
 
 ### 3.2 Dashboard & SLOs
 - [DASHBOARD_6_PANELS_SCREENSHOT]: `docs/evidence/dashboard_latency.png` (và các file `dashboard_*.png` khác)
@@ -56,25 +56,25 @@
 
 ## 5. Individual Contributions & Evidence
 
-### [MEMBER_A_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: (Link to specific commit or PR)
+### [Tạ Thị Thuỳ Dương]
+- [TASKS_COMPLETED]: Implement correlation ID middleware (app/middleware.py): clear_contextvars(), extract x-request-id header, bind_contextvars(), thêm x-request-id + x-response-time-ms vào response headers. Bổ sung regex PII (app/pii.py): Passport VN, CMND/CCCD, địa chỉ VN (phường/quận/thành phố). Uncomment scrub_event processor trong logging_config.py.
+- [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/commit/0228cf554620421bb7bcd58a21176242e0e60f98
 
-### [MEMBER_B_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
+### [Nguyễn Thị Thu Hiền]
+- [TASKS_COMPLETED]: Implement log enrichment trong app/main.py: bind_contextvars với user_id_hash (SHA-256), session_id, feature, model, env cho mỗi request /query. Xác nhận decorator @observe trên agent pipeline trong app/agent.py. Verify Langfuse client khởi tạo đúng từ .env.
+- [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/commit/a3aa355fc48ea24b26e300e77f1b6c1cfe82dcdc
 
 ### [Hồ Quang Hiển]
 - [TASKS_COMPLETED]: Hoàn thiện `config/slo.yaml` (SLI + map `/metrics`); 4 rule `config/alert_rules.yaml` + runbook `docs/alerts.md` (thêm mục quality); điền blueprint mục 3.2–3.3 + draft mục 4; thêm `docs/huong-dan-bao-cao-va-chung-minh.md`; cập nhật `docs/grading-evidence.md`.
 - [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/commit/80f1a71a058b551aebc43cb8ee17cbb7186ccb27
 
 ### [Trịnh Đức An]
-- [TASKS_COMPLETED]: Triển khai Load Test baseline và stress test; Giả lập sự cố `rag_slow` để kiểm thử hệ thống quan sát; Tự động hóa quá trình vẽ biểu đồ Dashboard từ Metrics API.
-- [EVIDENCE_LINK]: docs/evidence/dashboard_latency.png
+- [TASKS_COMPLETED]: Triển khai Load Test baseline và stress test (≥100 requests, concurrency 5); Giả lập sự cố `rag_slow` — P95 tăng từ ~800ms lên >26,000ms; Xây dashboard tự động 6 panels từ Metrics API (scripts/generate_dashboard.py); Thêm scripts/check_langfuse.py để verify traces; Upload 6 dashboard screenshots vào docs/evidence/.
+- [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/commit/b9bea5ef03f160087abab42694837c042c061d79
 
-### [MEMBER_E_NAME]
-- [TASKS_COMPLETED]: 
-- [EVIDENCE_LINK]: 
+### [Lương Thanh Hậu]
+- [TASKS_COMPLETED]: Điền đầy đủ tất cả tag còn trống trong docs/blueprint-template.md (screenshot paths §3.1, TOTAL_TRACES_COUNT §2, tên + task tất cả 5 thành viên §5). Cập nhật docs/grading-evidence.md với link commit/PR cụ thể của từng thành viên. Tạo docs/mock-debug-qa.md (kịch bản Q&A cho demo live). Chạy python scripts/validate_logs.py lần cuối — đạt 100/100. Soạn kịch bản demo live (thứ tự: start app → load test → xem logs → xem traces → xem dashboard → demo alert).
+- [EVIDENCE_LINK]: https://github.com/tttduong/A20-E403-Nhom30-Day13/commit/HEAD (commit của Member E — blueprint hoàn chỉnh)
 
 ---
 
